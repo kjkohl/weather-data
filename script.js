@@ -12,7 +12,7 @@ async function getWeather() {
 
     showLoadingScreen(true);
 
-    const apiKey = 'b512babe4fd716813ee5308de90c7c19'; // Replace with your actual OpenWeatherMap API key
+    const apiKey = 'b512babe4fd716813ee5308de90c7c19'; // Replace with your actual API key
     const unit = useCelsius ? 'metric' : 'imperial';
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityOrZip}&appid=${apiKey}&units=${unit}`;
     const hourlyApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityOrZip}&appid=${apiKey}&units=${unit}`;
@@ -20,7 +20,7 @@ async function getWeather() {
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error('Location not found');
+            throw new Error('City not found');
         }
         const data = await response.json();
 
@@ -30,6 +30,9 @@ async function getWeather() {
 
         // Fetch hourly forecast
         const hourlyResponse = await fetch(hourlyApiUrl);
+        if (!hourlyResponse.ok) {
+            throw new Error('Hourly forecast not found');
+        }
         const hourlyData = await hourlyResponse.json();
         displayHourlyForecast(hourlyData);
     } catch (error) {
