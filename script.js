@@ -1,74 +1,37 @@
-const apiKey = process.env.OPENWEATHERMAP_API_KEY;
-const cityInput = document.getElementById('city-input');
-const searchBtn = document.getElementById('search-btn');
-const cityName = document.getElementById('city-name');
-const weatherDescription = document.getElementById('weather-description');
-const temperature = document.getElementById('temperature');
-const humidity = document.getElementById('humidity');
-const windSpeed = document.getElementById('wind-speed');
-const weatherContainer = document.querySelector('.weather-container');
+const weatherForm = document.getElementById('weatherForm');
+const cityInput = document.getElementById('city');
+const weatherDisplay = document.getElementById('weatherDisplay');
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchWeatherData('London'); // default city
-});
+async function getWeather(city) {
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
-searchBtn.addEventListener('click', () => {
-    fetchWeatherData(cityInput.value);
-});
+    try {
+        const response await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('City not found!'):
+        }
 
-function fetchWeatherData(city) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            cityInput.value = '';
-            cityInput.blur();
-            updateWeatherData(data);
-        })
-        .catch(error => console.error(error));
-}
-
-function updateWeatherData(data) {
-    const weather = data.weather[0];
-    const weatherDescriptionText = weather.description;
-    const weatherIcon = weather.icon;
-    const temperatureValue = data.main.temp;
-    const humidityValue = data.main.humidity;
-    const windSpeedValue = data.wind.speed;
-    const timeOfDay = new Date().getHours();
-
-    cityName.textContent = data.name;
-    weatherDescription.textContent = weatherDescriptionText;
-    temperature.textContent = `Temperature: ${temperatureValue}°C`;
-    humidity.textContent = `Humidity: ${humidityValue}%`;
-    windSpeed.textContent = `Wind Speed: ${windSpeedValue} m/s`;
-
-    updateBackground(weatherIcon, timeOfDay);
-}
-
-function updateBackground(weatherIcon, timeOfDay) {
-    let backgroundStyle = '';
-
-    switch (weatherIcon) {
-        case '01d':
-            backgroundStyle = '--background-sunny';
-            break;
-        case '02d':
-        case '03d':
-        case '04d':
-            backgroundStyle = '--background-cloudy';
-            break;
-        case '09d':
-        case '10d':
-            backgroundStyle = '--background-rainy';
-            break;
-        default:
-            if (timeOfDay >= 6 && timeOfDay <= 18) {
-                backgroundStyle = '--background-day';
-            } else {
-                backgroundStyle = '--background-night';
-            }
+        const data = await response.json();
+        displayWeather(data);
+    } catch (error) {
+        weatherDisplay.innerHTML = `<p>${error.message}</p>`;
     }
-
-    weatherContainer.style.background = `var(${backgroundStyle})`;
 }
+
+function displayWeather(data) {
+    const {name, main, weather} = data;
+    const html = `
+    <h2>Weather in ${name}</h2>
+    <p>Temperature: ${main.temp}°C</p>
+    <p>Condition: ${weather[0].description}</p>
+    `;
+    weatherDisplay.innerHTML = html;
+}
+
+weatherForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const city = cityInput.value;
+    if (city) {
+        getWeather(city);
+    }
+});
