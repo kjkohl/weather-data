@@ -5,17 +5,29 @@ const weatherDisplay = document.getElementById('weatherDisplay');
 
 // Function to fetch weather data from the server
 async function getWeather(city) {
-    const apiUrl = `/weather?city=${city}`;
-
     try {
+        // Validate city input
+        if (!city || city.trim() === '') {
+            throw new Error('Please enter a valid city name');
+        }
+
+        const apiUrl = `/weather?city=${encodeURIComponent(city)}`;
+
         const response = await fetch(apiUrl);
         if (!response.ok) {
             throw new Error('City not found');
         }
 
         const data = await response.json();
+
+        // Validate data structure
+        if (!data || !data.name || !data.main || !data.weather) {
+            throw new Error('Invalid data structure');
+        }
+
         displayWeather(data);
     } catch (error) {
+        console.error(error); // Log error to console for debugging
         weatherDisplay.innerHTML = `<p>${error.message}</p>`;
     }
 }
@@ -35,7 +47,7 @@ function displayWeather(data) {
 // Add event listener to the form
 weatherForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    const city = cityInput.value;
+    const city = cityInput.value.trim(); // Trim input value
     if (city) {
         getWeather(city);
     }
