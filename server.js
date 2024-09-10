@@ -10,7 +10,7 @@ app.use(express.static('.'));
 app.get('/weather', async (req, res) => {
     const city = req.query.city;
     const apiKey = process.env.API_KEY;
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityOrZip}&appid=${apiKey}&units=metric`;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
     try {
         const response = await fetch(apiUrl);
