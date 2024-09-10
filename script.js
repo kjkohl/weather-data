@@ -63,4 +63,12 @@ function updateBackground(weatherIcon, timeOfDay) {
             backgroundStyle = '--background-rainy';
             break;
         default:
-            if (timeOfDay >= 
+            if (timeOfDay >= 6 && timeOfDay <= 18) {
+                backgroundStyle = '--background-day';
+            } else {
+                backgroundStyle = '--background-night';
+            }
+    }
+
+    weatherContainer.style.background = `var(${backgroundStyle})`;
+}
