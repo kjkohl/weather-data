@@ -4,21 +4,23 @@ document.getElementById('toggleUnits').addEventListener('click', toggleUnits);
 let useCelsius = true;
 
 async function getWeather() {
-    const city = document.getElementById('city').value;
-    if (city === '') {
-        alert('Please enter a city name');
+    const cityOrZip = document.getElementById('city').value.trim();
+    if (cityOrZip === '') {
+        alert('Please enter a city name or ZIP code');
         return;
     }
 
-    const apiKey = 'b512babe4fd716813ee5308de90c7c19'; // Hypothetical API key
+    showLoadingScreen(true);
+
+    const apiKey = 'b512babe4fd716813ee5308de90c7c19'; // Replace with your actual OpenWeatherMap API key
     const unit = useCelsius ? 'metric' : 'imperial';
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${unit}`;
-    const hourlyApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${unit}`;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityOrZip}&appid=${apiKey}&units=${unit}`;
+    const hourlyApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityOrZip}&appid=${apiKey}&units=${unit}`;
 
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error('City not found');
+            throw new Error('Location not found');
         }
         const data = await response.json();
 
@@ -32,6 +34,8 @@ async function getWeather() {
         displayHourlyForecast(hourlyData);
     } catch (error) {
         alert(error.message);
+    } finally {
+        showLoadingScreen(false);
     }
 }
 
@@ -50,4 +54,9 @@ function toggleUnits() {
     useCelsius = !useCelsius;
     document.getElementById('toggleUnits').textContent = useCelsius ? '°C' : '°F';
     getWeather(); // Refresh weather with new units
+}
+
+function showLoadingScreen(show) {
+    const loadingScreen = document.getElementById('loadingScreen');
+    loadingScreen.style.display = show ? 'flex' : 'none';
 }
